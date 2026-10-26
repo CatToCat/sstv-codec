@@ -1,0 +1,26 @@
+{
+  "name": "sstv-codec",
+  "version": "1.0.0",
+  "description": "Zero-dependency, browser-native SSTV (Slow Scan TV) Robot36 audio encoder & decoder running purely on Web Audio & Web Workers.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/test-roundtrip.js"
+  },
+  "keywords": [
+    "sstv",
+    "robot36",
+    "ham-radio",
+    "ariss",
+    "dsp",
+    "audio-decoder",
+    "audio-encoder",
+    "web-audio"
+  ],
+  "author": "OrekiYuta",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
