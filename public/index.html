@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSTV Codec</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Apple-style Navigation Bar -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-group">
+        <span class="brand-title">SSTV Codec</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-subtitle">Slow Scan Television</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dual-Column Split Workspace -->
+  <main>
+    <div class="split-grid">
+
+      <!-- ================= LEFT: ENCODE ================= -->
+      <section class="apple-card">
+        <div class="card-topbar">
+          <div>
+            <h2 class="card-title">Encode</h2>
+            <p class="card-desc">Synthesize image into SSTV audio</p>
+          </div>
+
+          <!-- Custom Apple Dropdown: Mode -->
+          <div class="apple-dropdown" id="encodeDropdown">
+            <button class="dropdown-trigger" type="button" id="encodeDropdownBtn">
+              <span class="trigger-label">MODE</span>
+              <span class="trigger-value" id="encodeCurrentMode">Robot 36</span>
+              <svg class="chevron" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="dropdown-menu" id="encodeDropdownMenu">
+              <div class="menu-item active" data-value="robot36">
+                <span class="item-text">Robot 36</span>
+                <span class="item-badge">Color &middot; 36s</span>
+                <span class="checkmark">&check;</span>
+              </div>
+              <div class="menu-item disabled" data-value="martin1">
+                <span class="item-text">Martin 1</span>
+                <span class="item-badge soon">Soon</span>
+              </div>
+              <div class="menu-item disabled" data-value="scottie1">
+                <span class="item-text">Scottie 1</span>
+                <span class="item-badge soon">Soon</span>
+              </div>
+              <div class="menu-item disabled" data-value="pd120">
+                <span class="item-text">PD 120</span>
+                <span class="item-badge soon">Soon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Display (Original Size & Full Aspect Ratio) -->
+        <div class="preview-stage" id="previewStage">
+          <canvas id="encodePreviewCanvas"></canvas>
+          <div class="crt-scanline" id="crtScanLine"></div>
+          <div class="resolution-badge" id="imageResolutionBadge">1080 &times; 1080 px</div>
+        </div>
+
+        <!-- Controls Stack -->
+        <div class="controls-stack">
+          <div class="input-actions-row">
+            <input type="text" id="watermarkText" class="apple-input" placeholder="Overlay callsign / text (optional)" value="NA1SS RS0ISS">
+            <button id="btnChooseImage" class="apple-btn apple-btn-secondary">
+              Upload Image
+            </button>
+            <input type="file" id="encodeFileInput" accept="image/*" style="display: none;">
+          </div>
+
+          <button id="btnStartEncode" class="apple-btn apple-btn-primary">
+            Synthesize Audio
+          </button>
+        </div>
+
+        <!-- Audio Output Area -->
+        <div class="audio-panel" id="encodeResultBox">
+          <div class="audio-panel-header">
+            <span>Synthesized Signal</span>
+            <span class="audio-tag" id="audioSpecsTag">Robot 36 &middot; 37.1s</span>
+          </div>
+          <audio id="audioPlayer" controls></audio>
+          <div class="audio-action-row">
+            <button id="btnDownloadWav" class="apple-btn apple-btn-secondary" style="flex: 1;">
+              Download .WAV
+            </button>
+            <button id="btnSendToDecoder" class="apple-btn apple-btn-secondary" style="flex: 1;">
+              Send to Decoder &rarr;
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= RIGHT: DECODE ================= -->
+      <section class="apple-card">
+        <div class="card-topbar">
+          <div>
+            <h2 class="card-title">Decode</h2>
+            <p class="card-desc">Extract SSTV frames from audio recordings</p>
+          </div>
+
+          <!-- Custom Apple Dropdown: Mode -->
+          <div class="apple-dropdown" id="decodeDropdown">
+            <button class="dropdown-trigger" type="button" id="decodeDropdownBtn">
+              <span class="trigger-label">MODE</span>
+              <span class="trigger-value" id="decodeCurrentMode">Robot 36</span>
+              <svg class="chevron" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="dropdown-menu" id="decodeDropdownMenu">
+              <div class="menu-item active" data-value="robot36">
+                <span class="item-text">Robot 36</span>
+                <span class="item-badge">Auto</span>
+                <span class="checkmark">&check;</span>
+              </div>
+              <div class="menu-item disabled" data-value="martin">
+                <span class="item-text">Martin</span>
+                <span class="item-badge soon">Soon</span>
+              </div>
+              <div class="menu-item disabled" data-value="scottie">
+                <span class="item-text">Scottie</span>
+                <span class="item-badge soon">Soon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Upload Dropzone -->
+        <div class="apple-dropzone" id="decodeDropzone">
+          <input type="file" id="decodeFileInput" accept="audio/*,.wav,.mp3,.m4a,.aac,.flac,.ogg" style="display: none;">
+          <div class="dropzone-arrow-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </div>
+          <div class="dropzone-main-text">Drop audio recording here</div>
+          <div class="dropzone-sub-text">Supports WAV, MP3, M4A, AAC, FLAC &middot; Zero server upload</div>
+        </div>
+
+        <!-- Scanning Progress -->
+        <div class="progress-bar-card" id="decodeProgressBox">
+          <div class="progress-labels">
+            <span id="decodeProgressMsg">Analyzing...</span>
+            <span id="decodeProgressPercent">0%</span>
+          </div>
+          <div class="progress-track-bg">
+            <div class="progress-fill" id="decodeProgressBar"></div>
+          </div>
+        </div>
+
+        <!-- Extracted Frames List -->
+        <div class="gallery-container" id="galleryList">
+          <div class="gallery-empty" id="galleryEmptyState">
+            No decoded images yet. Upload an audio recording or synthesize one on the left.
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

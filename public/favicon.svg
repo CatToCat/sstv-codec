@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="SSTV Codec">
+    <defs>
+        <linearGradient id="sstvGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0071e3"/>
+            <stop offset="100%" stop-color="#34c759"/>
+        </linearGradient>
+    </defs>
+    <rect width="64" height="64" rx="14" fill="#111827"/>
+    <!-- Screen frame -->
+    <rect x="10" y="10" width="44" height="34" rx="6" fill="#1f2937" stroke="url(#sstvGrad)" stroke-width="2"/>
+    <!-- Scanlines -->
+    <line x1="16" y1="18" x2="48" y2="18" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+    <line x1="16" y1="24" x2="48" y2="24" stroke="#34c759" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+    <line x1="16" y1="30" x2="48" y2="30" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+    <line x1="16" y1="36" x2="36" y2="36" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/>
+    <!-- Signal pulse waveform below screen -->
+    <path d="M14 52 L22 52 L25 46 L29 57 L33 48 L36 53 L39 51 L42 52 L50 52" fill="none" stroke="url(#sstvGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
