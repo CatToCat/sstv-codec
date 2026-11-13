@@ -322,37 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     processAudioFile(file);
   });
 
-  // Reconstruct 320x240 frame back to original image size & aspect ratio
-  function reconstructToOriginalSize(rawCanvas, targetW, targetH, targetAspect) {
-    const outCanvas = document.createElement('canvas');
-    outCanvas.width = targetW;
-    outCanvas.height = targetH;
-    const outCtx = outCanvas.getContext('2d');
-
-    const sstvAspect = WIDTH / HEIGHT; // 4:3
-
-    let sx, sy, sW, sH;
-    if (targetAspect > sstvAspect) {
-      // Source was wider than 4:3 -> during encoding it was fitted to width
-      sW = WIDTH;
-      sH = Math.round(WIDTH / targetAspect);
-      sx = 0;
-      sy = Math.round((HEIGHT - sH) / 2);
-    } else {
-      // Source was taller than 4:3 -> during encoding it was fitted to height (e.g. 1:1)
-      sH = HEIGHT;
-      sW = Math.round(HEIGHT * targetAspect);
-      sx = Math.round((WIDTH - sW) / 2);
-      sy = 0;
-    }
-
-    outCtx.imageSmoothingEnabled = true;
-    outCtx.imageSmoothingQuality = 'high';
-    outCtx.drawImage(rawCanvas, sx, sy, sW, sH, 0, 0, targetW, targetH);
-    return outCanvas;
-  }
-
-  // Render decoded frames at full original image size
+  // Render decoded frames at native SSTV resolution
   function renderDecodedResults(matches) {
     galleryList.innerHTML = '';
 
@@ -364,11 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       return;
     }
-
-    // Determine target output size based on original image
-    const targetW = originalSpecs.width || 1080;
-    const targetH = originalSpecs.height || 1080;
-    const targetAspect = originalSpecs.aspect || 1.0;
 
     matches.forEach((item, index) => {
       const card = document.createElement('div');
@@ -406,11 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
         0
       );
 
-      const outCanvas = reconstructToOriginalSize(rawCanvas, targetW, targetH, targetAspect);
       const displayCanvas = card.querySelector(`#displayCanvas_${index}`);
-      displayCanvas.width = outCanvas.width;
-      displayCanvas.height = outCanvas.height;
-      displayCanvas.getContext('2d').drawImage(outCanvas, 0, 0);
+      displayCanvas.width = WIDTH;
+      displayCanvas.height = HEIGHT;
+      displayCanvas.getContext('2d').drawImage(rawCanvas, 0, 0);
 
       card.querySelector('.btn-save').addEventListener('click', () => {
         const a = document.createElement('a');
