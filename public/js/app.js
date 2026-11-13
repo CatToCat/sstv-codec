@@ -388,102 +388,33 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="gallery-canvas-wrap">
           <canvas id="displayCanvas_${index}"></canvas>
-          <div class="resolution-badge" id="badge_${index}">${targetW} &times; ${targetH} px</div>
         </div>
         <div class="gallery-card-bottom">
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <div class="pill-switch">
-              <button class="pill-btn active" data-color="rgb">RGB</button>
-              <button class="pill-btn" data-color="gray">Luminance</button>
-            </div>
-            <div class="pill-switch">
-              <button class="pill-btn active" data-size="original">Original (${targetW}&times;${targetH})</button>
-              <button class="pill-btn" data-size="raw">Raw (320&times;240)</button>
-            </div>
-          </div>
+          <div></div>
           <button class="apple-btn apple-btn-secondary btn-save" style="padding: 0.4rem 0.95rem; font-size: 0.82rem;">
             Save PNG
           </button>
         </div>
       `;
 
-      // 1. Prepare raw 320x240 offscreen canvases for RGB and Gray
-      const rawRgbCanvas = document.createElement('canvas');
-      rawRgbCanvas.width = WIDTH;
-      rawRgbCanvas.height = HEIGHT;
-      rawRgbCanvas.getContext('2d').putImageData(
+      const rawCanvas = document.createElement('canvas');
+      rawCanvas.width = WIDTH;
+      rawCanvas.height = HEIGHT;
+      rawCanvas.getContext('2d').putImageData(
         new ImageData(new Uint8ClampedArray(item.rgbData), WIDTH, HEIGHT),
         0,
         0
       );
 
-      const rawGrayCanvas = document.createElement('canvas');
-      rawGrayCanvas.width = WIDTH;
-      rawGrayCanvas.height = HEIGHT;
-      rawGrayCanvas.getContext('2d').putImageData(
-        new ImageData(new Uint8ClampedArray(item.grayData), WIDTH, HEIGHT),
-        0,
-        0
-      );
-
-      // 2. Prepare restored original-size canvases for RGB and Gray
-      const origRgbCanvas = reconstructToOriginalSize(rawRgbCanvas, targetW, targetH, targetAspect);
-      const origGrayCanvas = reconstructToOriginalSize(rawGrayCanvas, targetW, targetH, targetAspect);
-
+      const outCanvas = reconstructToOriginalSize(rawCanvas, targetW, targetH, targetAspect);
       const displayCanvas = card.querySelector(`#displayCanvas_${index}`);
-      const dispCtx = displayCanvas.getContext('2d');
-      const badge = card.querySelector(`#badge_${index}`);
+      displayCanvas.width = outCanvas.width;
+      displayCanvas.height = outCanvas.height;
+      displayCanvas.getContext('2d').drawImage(outCanvas, 0, 0);
 
-      let currentColor = 'rgb';
-      let currentSize = 'original';
-
-      function updateDisplay() {
-        const isOrig = currentSize === 'original';
-        const sourceCanvas = currentColor === 'rgb' 
-          ? (isOrig ? origRgbCanvas : rawRgbCanvas)
-          : (isOrig ? origGrayCanvas : rawGrayCanvas);
-
-        displayCanvas.width = sourceCanvas.width;
-        displayCanvas.height = sourceCanvas.height;
-        dispCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
-        dispCtx.drawImage(sourceCanvas, 0, 0);
-
-        // Raw mode uses pixelated rendering to showcase authentic SSTV scanline pixels
-        displayCanvas.style.imageRendering = isOrig ? 'auto' : 'pixelated';
-
-        badge.textContent = `${displayCanvas.width} \u00d7 ${displayCanvas.height} px`;
-      }
-
-      // Default: show restored Original Size (e.g. 1080x1080)
-      updateDisplay();
-
-      // Handle Color switch (RGB / Gray)
-      const colorBtns = card.querySelectorAll('[data-color]');
-      colorBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          colorBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentColor = btn.dataset.color;
-          updateDisplay();
-        });
-      });
-
-      // Handle Size switch (Original / Raw)
-      const sizeBtns = card.querySelectorAll('[data-size]');
-      sizeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          sizeBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentSize = btn.dataset.size;
-          updateDisplay();
-        });
-      });
-
-      // Handle Download button (saves at currently selected size: full original resolution by default)
       card.querySelector('.btn-save').addEventListener('click', () => {
         const a = document.createElement('a');
-        const sizeTag = currentSize === 'original' ? `${targetW}x${targetH}` : '320x240';
-        a.download = `sstv_decoded_${index + 1}_${sizeTag}_${min}m${Math.round(sec)}s.png`;
+        a.download = `sstv_decoded_${index + 1}_${min}m${Math.round(sec)}s.png`;
         a.href = displayCanvas.toDataURL('image/png');
         a.click();
       });
